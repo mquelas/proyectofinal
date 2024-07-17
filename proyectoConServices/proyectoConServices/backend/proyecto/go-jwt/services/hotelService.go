@@ -163,3 +163,20 @@ func DeleteHotel(id int) error {
 	}
 	return nil
 }
+
+// MOCK
+type HotelService interface {
+	CreateHotel(dto dtos.HotelDto) (*models.Hotel, error)
+}
+
+// Implementación real del servicio, si ya existe
+type hotelService struct{}
+
+func NewHotelService() HotelService {
+	return &hotelService{}
+}
+
+func (s *hotelService) CreateHotel(dto dtos.HotelDto) (*models.Hotel, error) {
+	// Aquí va la lógica para crear un hotel
+	return nil, nil
+}

@@ -330,3 +330,36 @@ func DeleteHotel(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Hotel deleted"})
 }
 */
+
+//MOCK
+
+type HotelController struct {
+	hotelService services.HotelService
+}
+
+func NewHotelController(service services.HotelService) *HotelController {
+	return &HotelController{
+		hotelService: service,
+	}
+}
+
+func (ctrl *HotelController) CreateHotel(c *gin.Context) {
+	var hotelDto dtos.HotelDto
+	if err := c.ShouldBindJSON(&hotelDto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	hotel, err := ctrl.hotelService.CreateHotel(hotelDto)
+	if err != nil {
+		// Check if the error is due to duplicate combination
+		if strings.Contains(err.Error(), "hotel with the same Name, Address, City, and Country already exists") {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create hotel"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"ID": hotel.ID})
+}
